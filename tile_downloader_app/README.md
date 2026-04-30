@@ -2,7 +2,7 @@
 
 一个用于下载并拼接 OpenSeadragon / Deep Zoom 瓦片图片的 Windows 桌面应用（PySide6 GUI）。
 
-## 1. 安装依赖
+## 1. 安装运行依赖
 
 ```bash
 pip install -r requirements.txt
@@ -14,12 +14,28 @@ pip install -r requirements.txt
 python main.py
 ```
 
-## 3. 打包 exe
+## 3. 一键补齐环境并打包 EXE（Windows）
+
+### 方式 A：双击脚本（推荐）
+
+- `build_exe.bat`（cmd）
+- `build_exe.ps1`（PowerShell）
+
+脚本会自动：
+
+1. 升级 `pip`
+2. 安装 `requirements-build.txt`（包含运行依赖 + PyInstaller）
+3. 输出单文件 GUI 程序 `dist/TileDownloader.exe`
+
+### 方式 B：手动命令
 
 ```bash
-pip install pyinstaller
-pyinstaller --onefile --windowed main.py
+pip install -r requirements-build.txt
+pyinstaller --noconfirm --clean --onefile --windowed --name TileDownloader main.py
 ```
+
+生成结果：`dist/TileDownloader.exe`
+
 
 ## 4. 示例参数
 
