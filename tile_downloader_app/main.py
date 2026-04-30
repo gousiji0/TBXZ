@@ -1,7 +1,9 @@
 import os
 import sys
+import tempfile
 from dataclasses import dataclass
 from typing import Dict, Tuple, Optional
+from urllib.parse import quote_plus
 
 import requests
 from PIL import Image
@@ -90,11 +92,22 @@ class TileWorker(QThread):
         self.log_signal.emit(f"正在下载 {x}_{y}.{self.config.ext}")
         return self.fetch_tile(tile_url, cache_path)
 
+    def ensure_output_dir(self, output_dir: str) -> None:
+        if os.path.isdir(output_dir):
+            return
+        os.makedirs(output_dir, exist_ok=True)
+
+    def build_cache_dir(self) -> str:
+        cfg = self.config
+        cache_key = quote_plus(f"{cfg.base_url}|{cfg.level}|{cfg.ext}")
+        cache_dir = os.path.join(tempfile.gettempdir(), "tile_downloader_cache", cache_key)
+        os.makedirs(cache_dir, exist_ok=True)
+        return cache_dir
+
     def download_and_merge(self) -> str:
         cfg = self.config
-        os.makedirs(cfg.output_dir, exist_ok=True)
-        cache_dir = os.path.join(cfg.output_dir, "tiles")
-        os.makedirs(cache_dir, exist_ok=True)
+        self.ensure_output_dir(cfg.output_dir)
+        cache_dir = self.build_cache_dir()
 
         x_values = list(range(cfg.x_start, cfg.x_end + 1))
         y_values = list(range(cfg.y_start, cfg.y_end + 1))
